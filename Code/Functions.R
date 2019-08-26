@@ -1,7 +1,7 @@
 # User functions used in the analysis
 
 # GISTEMP Uncertainty Analysis
-# Version 1.0 (May 1, 2019)
+# Version 1.1 (August 15, 2019)
 # Nathan Lenssen (lenssen@ldeo.columbia.edu)
 
 ###############################################################################
@@ -437,8 +437,13 @@ totalLandUncertainty <- function(resultsList,tDec,normalVal=1.96){
 	# get the beta and sigma estimates
 	sigma <- rep(NA, length(tDec))
 	beta  <- rep(NA, length(tDec))
-	se    <- rep(NA, length(tDec))
-	variance <- rep(NA, length(tDec))
+	beta2 <- rep(NA, length(tDec))
+
+	se     <- rep(NA, length(tDec))
+	se2    <- rep(NA, length(tDec))
+
+	variance  <- rep(NA, length(tDec))
+	variance2 <- rep(NA, length(tDec))
 
 	diffVar  <- rep(NA, length(tDec))
 
@@ -446,8 +451,13 @@ totalLandUncertainty <- function(resultsList,tDec,normalVal=1.96){
 		obj <- differenceSeriesLM(trueGlobal,maskGlobal[i,],plotting=F)
 		sigma[i] <- obj$lmSD
 		beta[i]  <- obj$slope
+		beta2[i] <- obj$slope2
+
 		se[i]    <- obj$se
-		variance[i] <- obj$se^2
+		se2[i]   <- obj$se2
+
+		variance[i]  <- obj$se^2
+		variance2[i] <- obj$se2^2
 
 		diffVar[i] <- var(trueGlobal - maskGlobal[i,])
 	}
@@ -455,7 +465,8 @@ totalLandUncertainty <- function(resultsList,tDec,normalVal=1.96){
 
 	globalLandCI <- normalVal * sigma
 
-	return(list(ci=globalLandCI,sigma=sigma,beta=beta,se=se,variance=variance,diffVar=diffVar))
+	return(list(ci=globalLandCI,sigma=sigma,beta=beta,se=se,variance=variance,diffVar=diffVar,
+				beta2 = beta2, se2 = se2, variance2 = variance2))
 }
 
 # NEED TO REWRITE OUR DECADE TO YEAR FUNCTION TO HANDLE GENERAL CASES
@@ -501,7 +512,10 @@ differenceSeriesLM <- function(trueYear, maskYear,plotting=TRUE,...){
 	tYear <- 1980:2016
 	diffSD <- sd(trueYear-maskYear)
 	fit <- lm(trueYear~maskYear)
+	fit2 <- lm(maskYear~trueYear)
+
 	lmSD <- summary(fit)$sigma
+	lmSD2 <- summary(fit)$sigma
 
 	if(plotting){
 		set.panel(1,3)
@@ -517,7 +531,8 @@ differenceSeriesLM <- function(trueYear, maskYear,plotting=TRUE,...){
 		legend("bottomright",paste("Regression SD:",round(lmSD,3)))
 	}
 
-	return(list(lmSD=lmSD,diffSD=diffSD,slope=fit$coefficients[2], se=summary(fit)$coefficients[2,2]))
+	return(list(lmSD=lmSD,diffSD=diffSD,slope=fit$coefficients[2], se=summary(fit)$coefficients[2,2],
+				lmSD2 = lmSD2, slope2 = fit2$coefficients[2], se2 = summary(fit2)$coefficients[2,2]))
 }
 monthToYearMeans <- function(monthMeans){
 	yearMeans <- rep(NA, length(monthMeans)/12)

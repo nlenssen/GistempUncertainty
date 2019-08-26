@@ -23,3 +23,10 @@ The codebase is to be run with `GistempUncertainty/` as the working directory. I
 * `Figures/` Plots saved from `Code/paperPlots.R` .
 * `Namelists/` Scripts that set run parameters. These should be altered before diving deeper into the code.
 * `Scripts/` Full analysis scripts.
+
+
+# Version Changes
+
+**1.1.0** Changes correcting an error in the bias uncertainty calculation
+
+**1.0.0** Original code release

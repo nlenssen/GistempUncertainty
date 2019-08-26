@@ -2,7 +2,7 @@
 # uncertainty paper.
 
 # GISTEMP Uncertainty Analysis
-# Version 1.0 (May 1, 2019)
+# Version 1.1 (August 15, 2019)
 # Nathan Lenssen (lenssen@ldeo.columbia.edu)
 
 # write output to the paper figures directory
@@ -456,6 +456,8 @@ dev.off()
 ################################################################################
 # Figure 8b: Slope plots with SE (All Reanalyses)
 ################################################################################
+yrFix <- c(0.6, 1.15)
+
 x1 <- tDec[subDec]+3.5
 y1 <- globalLandCIJRA$beta[subDec]
 ci1 <- globalLandCIJRA$se[subDec]
@@ -474,7 +476,7 @@ ci3 <- globalLandCIERA$se[subDec]
 upper3 <- y3 + ci3*1.96
 lower3 <- y3 - ci3*1.96
 
-yr <- range(1/upper1,1/upper2,1/upper3,1/lower1,1/lower2,1/lower3)
+yr <- range(1/upper1,1/upper2,1/upper3,1/lower1,1/lower2,1/lower3,yrFix)
 
 pdf(sprintf('%s/08lstSlopesComp.pdf',plotdir),10,7)
 par(mfrow=c(1,1),mar=c(5, 5, 4, 3) + 0.1)
@@ -496,6 +498,72 @@ for(i in 1:length(x)) lines(x=c(x3[i],x3[i]),y=c(1/lower3[i],1/upper3[i]), lwd=2
 legend('bottomright',c('JRA55','MERRA2','ERA5'),col=c('red','black','blue'),lwd=2,pch=19,bg='white',
 	cex=cexScale)
 dev.off()
+
+################################################################################
+# Figure 8b CORRECTED: Slope plots with SE (All Reanalyses) CORRECTED
+################################################################################
+x1 <- tDec[subDec]+3.5
+y1 <- globalLandCIJRA$beta2[subDec]
+ci1 <- globalLandCIJRA$se2[subDec]
+upper1 <- y1 + ci1*1.96
+lower1 <- y1 - ci1*1.96
+
+x2 <- tDec[subDec]+5
+y2 <- globalLandCIMERRA$beta2[subDec]
+ci2 <- globalLandCIMERRA$se2[subDec]
+upper2 <- y2 + ci2*1.96
+lower2 <- y2 - ci2*1.96
+
+x3 <- tDec[subDec]+6.5
+y3 <- globalLandCIERA$beta2[subDec]
+ci3 <- globalLandCIERA$se2[subDec]
+upper3 <- y3 + ci3*1.96
+lower3 <- y3 - ci3*1.96
+
+yr <- range(upper1,upper2,upper3,lower1,lower2,lower3,yrFix)
+
+pdf(sprintf('%s/08lstSlopesCompCORRECTEDTitle.pdf',plotdir),10,7)
+par(mfrow=c(1,1),mar=c(5, 5, 4, 3) + 0.1)
+plot(x1,y1,pch=19,ylim=yr,xlab='Decadal Distribution of Stations', ylab='Estimated Bias (95% CI)',
+	main='Estimated Bias for Land-Only Global Mean (Corrected)', col='red',
+    		cex.lab=cexScale, cex.axis=cexScale, cex.main=cexScale)
+grid(lwd=gridlwd)
+
+points(x2,y2,pch=19,col='black')
+points(x3,y3,pch=19,col='blue')
+
+abline(h=1,lty=2, lwd=2, col='black')
+abline(v=1980, lwd=2, lty=3, col='red')
+
+for(i in 1:length(x)) lines(x=c(x1[i],x1[i]),y=c(lower1[i],upper1[i]), lwd=2, col='red')
+for(i in 1:length(x)) lines(x=c(x2[i],x2[i]),y=c(lower2[i],upper2[i]), lwd=2, col='black')
+for(i in 1:length(x)) lines(x=c(x3[i],x3[i]),y=c(lower3[i],upper3[i]), lwd=2, col='blue')
+
+legend('bottomright',c('JRA55','MERRA2','ERA5'),col=c('red','black','blue'),lwd=2,pch=19,bg='white',
+	cex=cexScale)
+dev.off()
+
+pdf(sprintf('%s/08lstSlopesCompCORRECTED.pdf',plotdir),10,7)
+par(mfrow=c(1,1),mar=c(5, 5, 4, 3) + 0.1)
+plot(x1,y1,pch=19,ylim=yr,xlab='Decadal Distribution of Stations', ylab='Estimated Bias (95% CI)',
+	main='Estimated Bias for Land-Only Global Mean', col='red',
+    		cex.lab=cexScale, cex.axis=cexScale, cex.main=cexScale)
+grid(lwd=gridlwd)
+
+points(x2,y2,pch=19,col='black')
+points(x3,y3,pch=19,col='blue')
+
+abline(h=1,lty=2, lwd=2, col='black')
+abline(v=1980, lwd=2, lty=3, col='red')
+
+for(i in 1:length(x)) lines(x=c(x1[i],x1[i]),y=c(lower1[i],upper1[i]), lwd=2, col='red')
+for(i in 1:length(x)) lines(x=c(x2[i],x2[i]),y=c(lower2[i],upper2[i]), lwd=2, col='black')
+for(i in 1:length(x)) lines(x=c(x3[i],x3[i]),y=c(lower3[i],upper3[i]), lwd=2, col='blue')
+
+legend('bottomright',c('JRA55','MERRA2','ERA5'),col=c('red','black','blue'),lwd=2,pch=19,bg='white',
+	cex=cexScale)
+dev.off()
+
 ################################################################################
 # Figure 9: Ocean Mean Series with CI from sigma2SG (1880-2014)
 ################################################################################

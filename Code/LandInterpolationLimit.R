@@ -1,7 +1,7 @@
 # Performs the limiting uncertainty experiment. Warning: very long running.
 
 # GISTEMP Uncertainty Analysis
-# Version 1.0 (May 1, 2019)
+# Version 1.1 (August 15, 2019)
 # Nathan Lenssen (lenssen@ldeo.columbia.edu)
 
 # load in the necessary data
@@ -67,6 +67,12 @@ globalLimitCI <- sqrt(globalVar)*1.96
 regFit     <- lm(trueMean$global ~ interpMean$global)
 globalBias <- regFit$coefficients[2]
 regCI      <- summary(regFit)$coefficients[2,2]
+
+regFitCorrected <- lm(interpMean$global ~ trueMean$global)
+globalBiasCorrected <- regFitCorrected$coefficients[2]
+regCICorrected      <- summary(regFitCorrected)$coefficients[2,2]
+
+c(globalBiasCorrected - 1.96 * regCICorrected, globalBiasCorrected + 1.96 * regCICorrected)
 
 save(trueMean,interpMean,globalLimitCI,globalBias,regCI,
 	file=sprintf('Data/%s/limitingGlobalCI_%s.Rda',reanalysis,reanalysis))
