@@ -3,7 +3,7 @@
 # require tuning of the number of cores used in the parallel loop.
 
 # GISTEMP Uncertainty Analysis
-# Version 1.0 (May 1, 2019)
+# Version 1.2.1 (December 12, 2019)
 # Nathan Lenssen (lenssen@ldeo.columbia.edu)
 
 # load the data
@@ -11,6 +11,7 @@ files <- system(sprintf('ls Data/%s/InterpolatedFields/',reanalysis),intern=T)
 
 load(sprintf('Data/%s/anomalyData_%s.Rda',reanalysis,reanalysis))
 load(sprintf('Data/%s/landMasks_%s.Rda',reanalysis,reanalysis))
+load(sprintf('Data/%s/area_%s.Rda',reanalysis,reanalysis))
 
 
 lon <- anomalyData$lon
@@ -38,7 +39,8 @@ trueMean <- globalMean(anomalyField = anomalyFieldAdj,
 					   mask = NULL,
 					   lat = lat,
 					   nCores=nCores,
-					   zoneMask = zoneMask)
+					   zoneMask = zoneMask,
+					   ALn = ALn, ALs = ALs)
 
 
 rm(anomalyFieldAdj)
@@ -63,7 +65,8 @@ for(i in 1:length(files)){
 						   mask = NULL,
 						   lat = lat,
 						   nCores=nCores,
-						   zoneMask = zoneMask)
+						   zoneMask = zoneMask,
+					 	   ALn = ALn, ALs = ALs)
 
 	
 	maskList[[i]] <- maskMean

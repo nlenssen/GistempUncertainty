@@ -1,3 +1,7 @@
+# GISTEMP Uncertainty Analysis
+# Version 1.2.1 (December 12, 2019)
+# Nathan Lenssen (lenssen@ldeo.columbia.edu)
+
 ########################################################################
 # Import the GHCN station metadata into an easy to work with format
 ########################################################################

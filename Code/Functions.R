@@ -1,7 +1,7 @@
 # User functions used in the analysis
 
 # GISTEMP Uncertainty Analysis
-# Version 1.1 (August 15, 2019)
+# Version 1.2.1 (December 12, 2019)
 # Nathan Lenssen (lenssen@ldeo.columbia.edu)
 
 ###############################################################################
@@ -263,7 +263,7 @@ triangleRBFVec <- function(dist,radius){
 ###############################################################################
 # Functions used in Mean Calculations
 ###############################################################################
-globalMean <- function(anomalyField,mask=NULL,lat,nCores=2,zoneMask,simpleMean=FALSE){
+globalMean <- function(anomalyField,mask=NULL,lat,nCores=2,zoneMask,simpleMean=FALSE, ALn, ALs){
 
 	require(foreach)
 	require(doParallel)
@@ -281,12 +281,12 @@ globalMean <- function(anomalyField,mask=NULL,lat,nCores=2,zoneMask,simpleMean=F
 	if(nCores > 1){
 		cl <- makeCluster(nCores)
 		registerDoParallel(cl)
-		outList <- foreach(time=1:nt, .export=c(fnExport)) %dopar% meanSlice(time,anomalyField,mask,lat,zoneMask,simpleMean)
+		outList <- foreach(time=1:nt, .export=c(fnExport)) %dopar% meanSlice(time,anomalyField,mask,lat,zoneMask,simpleMean, ALn, ALs)
 
 		stopCluster(cl)
 		gc()
 	} else{
-		outList <- foreach(time=1:nt, .export=c(fnExport)) %do% meanSlice(time,anomalyField,mask,lat,zoneMask,simpleMean)
+		outList <- foreach(time=1:nt, .export=c(fnExport)) %do% meanSlice(time,anomalyField,mask,lat,zoneMask,simpleMean, ALn, ALs)
 		gc()
 	}
 
@@ -304,7 +304,7 @@ globalMean <- function(anomalyField,mask=NULL,lat,nCores=2,zoneMask,simpleMean=F
 	return(outList)
 }
 
-meanSlice <- function(time,anomalyField,mask,lat,zoneMask,simpleMean=FALSE){
+meanSlice <- function(time,anomalyField,mask,lat,zoneMask,simpleMean=FALSE, ALn, ALs){
 	if(is.null(mask)){
 		trueField <- anomalyField[,,time]
 	} else{
@@ -314,13 +314,13 @@ meanSlice <- function(time,anomalyField,mask,lat,zoneMask,simpleMean=FALSE){
 	if(simpleMean){
 		outObj <- explicitMean(trueField,lat)
 	} else{
-		outObj <- gistempGlobalMeanUpdated(trueField,lat,zoneMask)
+		outObj <- gistempGlobalMeanUpdated(trueField,lat,zoneMask, ALn, ALs)
 	}
 
 	return(outObj)
 }
 
-gistempGlobalMeanUpdated <- function(fieldSlice,lat,zoneMask){
+gistempGlobalMeanUpdated <- function(fieldSlice,lat,zoneMask, ALn, ALs){
 	nx <- dim(fieldSlice)[1]
 	ny <- dim(fieldSlice)[2]
 
@@ -364,13 +364,14 @@ gistempGlobalMeanUpdated <- function(fieldSlice,lat,zoneMask){
 		bandMeans[band] <- sum(boxMeans*boxWeights,na.rm=TRUE)/bandWeight[band]
 	}
 
-	#areaWeights <- c(5,10,15,20,20,15,10,5)/100
-	weightedBandMeans <- bandMeans * bandWeight #*areaWeights
+	# take the data-avaiablility weighted means of the boxes within a band
+	weightedBandMeans <- bandMeans * bandWeight
 
-	nHemisMean <- sum(weightedBandMeans[5:8],na.rm=T)/sum(bandWeight[5:8]) #include areaWeights?
-	sHemisMean <- sum(weightedBandMeans[1:4],na.rm=T)/sum(bandWeight[5:8])
+	nHemisMean <- sum(weightedBandMeans[5:8],na.rm=T)/sum(bandWeight[5:8]) 
+	sHemisMean <- sum(weightedBandMeans[1:4],na.rm=T)/sum(bandWeight[1:4])
 
-	globalMean <- mean(c(nHemisMean,sHemisMean),na.rm=TRUE)
+	# area weighted mean of hemispheres (following GISTEMP algorithm)
+	globalMean <- sum(ALn * nHemisMean + ALs * sHemisMean)/(ALn + ALs) 
 
 	outList <- list(global=globalMean,nh=nHemisMean,sh=sHemisMean,bands=bandMeans)
 	return(outList)
@@ -534,6 +535,7 @@ differenceSeriesLM <- function(trueYear, maskYear,plotting=TRUE,...){
 	return(list(lmSD=lmSD,diffSD=diffSD,slope=fit$coefficients[2], se=summary(fit)$coefficients[2,2],
 				lmSD2 = lmSD2, slope2 = fit2$coefficients[2], se2 = summary(fit2)$coefficients[2,2]))
 }
+
 monthToYearMeans <- function(monthMeans){
 	yearMeans <- rep(NA, length(monthMeans)/12)
 

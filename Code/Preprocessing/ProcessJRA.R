@@ -1,3 +1,8 @@
+# GISTEMP Uncertainty Analysis
+# Version 1.2.1 (December 12, 2019)
+# Nathan Lenssen (lenssen@ldeo.columbia.edu)
+
+
 files <- system(sprintf('ls %s/JRA/t2m/',ddirRaw), intern=TRUE)
 nt <- length(files)
 

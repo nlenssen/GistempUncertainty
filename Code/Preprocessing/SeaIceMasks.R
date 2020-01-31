@@ -1,3 +1,7 @@
+# GISTEMP Uncertainty Analysis
+# Version 1.2.1 (December 12, 2019)
+# Nathan Lenssen (lenssen@ldeo.columbia.edu)
+
 # get all of the MERRA sea ice netcdf files
 files <- system(sprintf('ls %s/MERRA/seaIce',ddirRaw),intern=TRUE)
 
@@ -52,6 +56,6 @@ maximalLandMask <- ifelse(apply(seasonalLandMask,c(1,2),function(x) any(!is.na(x
 save(seasonalLandMask,maximalLandMask,file=sprintf('Data/%s/landMasks_%s.Rda','MERRA','MERRA'))
 
 
-# create the sea ice land masks on the other reanalysis grids (function saves the outputß)
+# create the sea ice land masks on the other reanalysis grids (function saves the output)
 landMaskNewGrid('ERA',lon,lat,seasonalLandMask)
 landMaskNewGrid('JRA',lon,lat,seasonalLandMask)

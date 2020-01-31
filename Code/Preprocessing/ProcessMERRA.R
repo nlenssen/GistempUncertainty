@@ -1,6 +1,10 @@
 # A script that reads in the raw MERRA Data and creates an R Data object
 # of monthly SAT anomalies on the MERRA grid
 
+# GISTEMP Uncertainty Analysis
+# Version 1.2.1 (December 12, 2019)
+# Nathan Lenssen (lenssen@ldeo.columbia.edu)
+
 ###############################################################################
 # STEP (1) Populate R array from merra ncdf
 ###############################################################################

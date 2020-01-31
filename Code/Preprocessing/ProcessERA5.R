@@ -1,3 +1,7 @@
+# GISTEMP Uncertainty Analysis
+# Version 1.2.1 (December 12, 2019)
+# Nathan Lenssen (lenssen@ldeo.columbia.edu)
+
 # CDO command used to map the ERA data to the MERRA grid
 
 # cdo remapcon,r576x361 era5_t2m.nc era5_t2m_merraGrid.nc

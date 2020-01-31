@@ -26,6 +26,9 @@ The codebase is to be run with `GistempUncertainty/` as the working directory. I
 
 
 # Version Changes
+**1.2.1** Changes to ERSST preprocessing for correction to SST ensemble mean calculation.
+
+**1.2.0** Changes correcting an error in the mean calculation. Results of sampling uncertainty for Global and SH means affected
 
 **1.1.0** Changes correcting an error in the bias uncertainty calculation
 

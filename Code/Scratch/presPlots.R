@@ -4,9 +4,9 @@ source('Namelists/Namelist_ERA.R')
 
 library(RColorBrewer)
 
-plotdir <- '/Users/lenssen/Dropbox/DEES/IMSC19/gistempTalk/Figures/codeFigures'
+plotdir <- '/Users/lenssen/Dropbox/DEES/Talks/AGU19/gistempTalk/Figures/codeFigures'
 # GISTEMP Uncertainty Analysis
-# Version 1.0 (May 1, 2019)
+# Version 1.2
 # Nathan Lenssen (lenssen@ldeo.columbia.edu)
 
 # write output to the paper figures directory
@@ -75,7 +75,7 @@ landMask <- seasonalLandMask[,,season]
 
 range(trueField)
 # smoosh the anomaly colorbar down
-zMax <- 6
+zMax <- 4
 
 zr <- c(-zMax, zMax)
 
@@ -109,52 +109,44 @@ binField     <- ifelse(!is.na(interpClip),1,NA)
 noCoverfield <- ifelse(is.na(interpClip),1,NA)
 
 # true field
-pdf(sprintf('%s/trueField.pdf',plotdir),10,7)
+pdf(sprintf('%s/trueField.pdf',plotdir),10,6)
 image.plot(lon,lat,anomClip*landMask,col=pal, zlim=zr,
 	xlab='', ylab='',
-	main='ERA5 True Field')
+	main='ERA5 True Field', cex.main=cexScale)
 world(add=T)
 
 dev.off()
 
 # approx station obs
-pdf(sprintf('%s/stationField.pdf',plotdir),10,7)
+pdf(sprintf('%s/stationField.pdf',plotdir),10,6)
 image.plot(lon,lat,anomClip*z,col=pal, zlim=zr,
 	xlab='', ylab='',
-	main='1880s Station Distribution')
+	main='1880s Station Distribution', cex.main=cexScale)
 world(add=T)
 points(pointLoc,pch=20,col=pointPal)
 dev.off()
 
 # interpolated field
-pdf(sprintf('%s/interpField.pdf',plotdir),10,7)
+pdf(sprintf('%s/interpField.pdf',plotdir),10,6)
 image.plot(lon,lat,interpClip,col=pal, zlim=zr,
 	xlab='', ylab='',
-	main='1880s Interploated Field')
+	main='1880s Interploated Field', cex.main=cexScale)
 world(add=T)
 
 # points(pointLoc,pch=20,col=pointPal)
 dev.off()
 
 # interpolated field
-pdf(sprintf('%s/interpFieldGrey.pdf',plotdir),10,7)
+pdf(sprintf('%s/interpFieldGrey.pdf',plotdir),10,6)
 image.plot(lon,lat,interpClip,col=pal, zlim=zr,
 	xlab='', ylab='',
-	main='1880s Interploated Field')
+	main='1880s Interploated Field', cex.main=cexScale)
 world(add=T)
 image(lon,lat,noCoverfield*landMask,col=adjustcolor('black',alpha=0.2),add=T)
 # points(pointLoc,pch=20,col=pointPal)
 dev.off()
 
 
-pdf(sprintf('%s/binaryField.pdf',plotdir),10,7)
-
-image.plot(lon,lat,interpClip,col=pal, zlim=zr,
-	xlab='', ylab='',
-	main='1880s Interploated Coverage',
-	legend=FALSE)
-image()
-world(add=T)
 # plot the results of the global mean
 
 dif <- resultsList$mask[[dec]]$global- resultsList$true$global
@@ -162,10 +154,11 @@ x <- seq(-1.5,1.5, length=300)
 y <- dnorm(x,mean(dif),sd(dif))
 
 pdf(sprintf('%s/difHist.pdf',plotdir),10,7)
-hist(dif, breaks=25, freq=FALSE,xlab='', main='Mask Global Mean Error (1880s)',xlim=c(-1,1))
+hist(dif, breaks=25, freq=FALSE,xlab='Masked Annual Mean Temperature Error (°C)', main='Sampling Uncertainty Distribution (1880s)',xlim=c(-1,1),
+	cex.lab=cexScale, cex.axis=cexScale, cex.main=cexScale)
 points(x,y,type='l',lwd=2,col='blue')
 
-legend('topright', c(paste('Standard Dev:',round(sd(dif),3))),bty='n', text.col='blue')
+legend('topright', c(paste('Standard Dev:',round(sd(dif),3))),bty='n', text.col='blue', cex=cexScale)
 dev.off()
 
 
@@ -469,6 +462,7 @@ dev.off()
 
 # plot of the ERA5 breakdown
 pdf(sprintf('%s/eraUncertainty.pdf',plotdir),10,7)
+par(mfrow=c(1,1), mar=c(5, 5, 4, 3) + 0.1)
 plot(tYearFull, sciERA, ylim=yr,type='l', lwd=2,
 	xlab='Year', ylab='95% LSAT Confidence Interval (°C)', main = 'LSAT Uncertainty with ERA5',
     cex.lab=cexScale, cex.axis=cexScale, cex.main=cexScale,col='blue')
@@ -1029,8 +1023,6 @@ legend('bottomright', c('Global Mean Temperature','LSAT Uncertainty', 'LSAT + SS
 legend('topleft', '(b)', cex = cexScale, bty='n')
 dev.off()
 
-save(gisGlobal2018,ciEnvelope2,file=c(sprintf('Data/%s/totalCI_%s.Rda',reanalysis,reanalysis)))
-
 
 
 pdf(sprintf('%s/totalSeries.pdf',plotdir),10,7)
@@ -1111,8 +1103,6 @@ dev.off()
 save(gisGlobal2018,lstsstFinal,file=sprintf('Data/%s/totalCI_%s.Rda',reanalysis,reanalysis))
 
 csvOut <- data.frame(year=tYear2018,gistemp=gisGlobal2018[,2],ci95=ciEnvelope2)
-
-write.csv(csvOut,file=sprintf('Data/%s/totalCI_%s.csv',reanalysis,reanalysis),row.names=FALSE)
 
 
 # figure for website
@@ -1221,7 +1211,8 @@ yMax <- 20
 pdf(sprintf('%s/warmestYear.pdf',plotdir),10,7)
 x <- seq(xMin, xMax, length=256)
 y <- dnorm(x,meanVec[1], sdVec[1])
-plot(x,y,ylim=c(0,yMax),type='l',col=pal[1], lwd=1.5,xlab='Mean Temperature Anomaly (°C)',ylab='',yaxt='n')
+plot(x,y,ylim=c(0,yMax),type='l',col=pal[1], lwd=1.5,xlab='Annual Mean Temperature Anomaly (°C)',ylab='',yaxt='n', 
+    		cex.lab=cexScale, cex.axis=cexScale, cex.main=cexScale)
 text(meanVec[1],max(y)+0.5, paste(giss[inds[1],1]),col=pal[1])
 
 for(i in 2:length(inds)){
@@ -1230,8 +1221,8 @@ for(i in 2:length(inds)){
 	text(meanVec[i],max(y)+0.5, paste(giss[inds[i],1]),col=pal[i])
 
 	if(giss[inds[i],1]==2016){
-		text(meanVec[i], max(y)-8, '86%', col=pal[i])
-		text(meanVec[i], max(y)-9, '(87%)', col=pal[i])
+		text(meanVec[i], max(y)-8, '87%', col=pal[i],cex=1.5)
+		#text(meanVec[i], max(y)-9, '(88%)', col=pal[i])
 	}
 }
 dev.off()

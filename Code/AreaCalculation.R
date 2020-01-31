@@ -2,7 +2,7 @@
 # a land mask.
 
 # GISTEMP Uncertainty Analysis
-# Version 1.0 (May 1, 2019)
+# Version 1.2.1 (December 12, 2019)
 # Nathan Lenssen (lenssen@ldeo.columbia.edu)
 
 # load in the necessary data

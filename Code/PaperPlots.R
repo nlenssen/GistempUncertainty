@@ -2,7 +2,7 @@
 # uncertainty paper.
 
 # GISTEMP Uncertainty Analysis
-# Version 1.1 (August 15, 2019)
+# Version 1.2.1 (December 12, 2019)
 # Nathan Lenssen (lenssen@ldeo.columbia.edu)
 
 # write output to the paper figures directory
@@ -428,80 +428,12 @@ legend('bottomright', '(b)', cex = cexScale, bty='n')
 
 dev.off()
 
-################################################################################
-# Figure 8: Slope plots with SE (1850 - Present)
-################################################################################
-x <- tDec[subDec]+5
-
-y <- globalLandCI$beta[subDec]
-ci <- globalLandCI$se[subDec]
-upper <- y + ci*1.96
-lower <- y - ci*1.96
-
-yr <- range(0.7, 1.05)
-
-pdf(sprintf('%s/08lstSlopes.pdf',plotdir),10,7)
-par(mfrow=c(1,1),mar=c(5, 5, 4, 3) + 0.1)
-plot(x,1/y,pch=19,ylim=yr,xlab='Decadal Distribution of Stations', ylab='Estimated Bias (95% CI)',
-	main='Estimated Bias for 1980-2016 Land-Only Global Mean', 
-    		cex.lab=cexScale, cex.axis=cexScale, cex.main=cexScale)
-grid(lwd=gridlwd)
-
-abline(h=1,lty=2, lwd=2, col='blue')
-abline(v=1980, lwd=2, lty=3, col='red')
-for(i in 1:length(x)) lines(x=c(x[i],x[i]),y=c(1/lower[i],1/upper[i]), lwd=2)
-dev.off()
-
 
 ################################################################################
-# Figure 8b: Slope plots with SE (All Reanalyses)
+# Figure 8: Slope plots with SE (All Reanalyses) CORRECTED
 ################################################################################
 yrFix <- c(0.6, 1.15)
 
-x1 <- tDec[subDec]+3.5
-y1 <- globalLandCIJRA$beta[subDec]
-ci1 <- globalLandCIJRA$se[subDec]
-upper1 <- y1 + ci1*1.96
-lower1 <- y1 - ci1*1.96
-
-x2 <- tDec[subDec]+5
-y2 <- globalLandCIMERRA$beta[subDec]
-ci2 <- globalLandCIMERRA$se[subDec]
-upper2 <- y2 + ci2*1.96
-lower2 <- y2 - ci2*1.96
-
-x3 <- tDec[subDec]+6.5
-y3 <- globalLandCIERA$beta[subDec]
-ci3 <- globalLandCIERA$se[subDec]
-upper3 <- y3 + ci3*1.96
-lower3 <- y3 - ci3*1.96
-
-yr <- range(1/upper1,1/upper2,1/upper3,1/lower1,1/lower2,1/lower3,yrFix)
-
-pdf(sprintf('%s/08lstSlopesComp.pdf',plotdir),10,7)
-par(mfrow=c(1,1),mar=c(5, 5, 4, 3) + 0.1)
-plot(x1,1/y1,pch=19,ylim=yr,xlab='Decadal Distribution of Stations', ylab='Estimated Bias (95% CI)',
-	main='Estimated Bias for Land-Only Global Mean', col='red',
-    		cex.lab=cexScale, cex.axis=cexScale, cex.main=cexScale)
-grid(lwd=gridlwd)
-
-points(x2,1/y2,pch=19,col='black')
-points(x3,1/y3,pch=19,col='blue')
-
-abline(h=1,lty=2, lwd=2, col='black')
-abline(v=1980, lwd=2, lty=3, col='red')
-
-for(i in 1:length(x)) lines(x=c(x1[i],x1[i]),y=c(1/lower1[i],1/upper1[i]), lwd=2, col='red')
-for(i in 1:length(x)) lines(x=c(x2[i],x2[i]),y=c(1/lower2[i],1/upper2[i]), lwd=2, col='black')
-for(i in 1:length(x)) lines(x=c(x3[i],x3[i]),y=c(1/lower3[i],1/upper3[i]), lwd=2, col='blue')
-
-legend('bottomright',c('JRA55','MERRA2','ERA5'),col=c('red','black','blue'),lwd=2,pch=19,bg='white',
-	cex=cexScale)
-dev.off()
-
-################################################################################
-# Figure 8b CORRECTED: Slope plots with SE (All Reanalyses) CORRECTED
-################################################################################
 x1 <- tDec[subDec]+3.5
 y1 <- globalLandCIJRA$beta2[subDec]
 ci1 <- globalLandCIJRA$se2[subDec]
@@ -699,6 +631,31 @@ dev.off()
 
 save(gisGlobal2018,ciEnvelope2,file=c(sprintf('Data/%s/totalCI_%s.Rda',reanalysis,reanalysis)))
 
+# figure for website
+
+pdf(sprintf('%s/websiteSeries.pdf',plotdir),10,7)
+par(mfrow=c(1,1),mar=c(5, 5, 4, 3) + 0.1)
+
+x <- tYear2018[goodInds]
+y <- gisGlobal2018[goodInds,3]
+
+plot(x,y,lwd=1,type='l',col='black',ylim=c(min(y-ciEnvelope2[goodInds],na.rm=T),max(y+ciEnvelope2[goodInds],na.rm=T)),xlim=range(tYear2018),
+	xlab='Year', ylab='Total Global Annual Mean Surface Temperature (°C)', 
+    		cex.lab=cexScale, cex.axis=cexScale, cex.main=cexScale)
+grid(lwd=gridlwd)
+points(x,y,lwd=1,type='l',col='black')
+
+polygon(x=c(x,rev(x)), y=c((y-ciEnvelope2[goodInds]), (rev(y) + rev(ciEnvelope2[goodInds]))) ,col='blue',border=NA)
+polygon(x=c(x,rev(x)), y=c((y-ciEnvelope3[goodInds]), (rev(y) + rev(ciEnvelope3[goodInds]))) ,col='green',border=NA)
+
+points(x,y,lwd=2,type='l',col='black')
+
+legend('bottomright', c('Global Mean Temperature','LSAT Uncertainty', 'LSAT + SST Uncertainty'),
+	col=c('black','green','blue'),lwd=c(2,6,6),
+	cex=cexScale,horiz=F,bg='white')
+dev.off()
+
+
 ################################################################################
 # Figure 11b: Final Global Annual time series (Flipped Order)
 ################################################################################
@@ -760,7 +717,7 @@ write.csv(csvOut,file=sprintf('Data/%s/totalCI_%s.csv',reanalysis,reanalysis),ro
 
 # figure for website
 
-pdf(sprintf('%s/websiteSeries.pdf',plotdir),10,7)
+pdf(sprintf('%s/websiteSeriesFlip.pdf',plotdir),10,7)
 par(mfrow=c(1,1),mar=c(5, 5, 4, 3) + 0.1)
 
 x <- tYear2018[goodInds]

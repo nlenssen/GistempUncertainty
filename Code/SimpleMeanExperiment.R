@@ -2,7 +2,7 @@
 # of the GISTEMP mean.
 
 # GISTEMP Uncertainty Analysis
-# Version 1.0 (May 1, 2019)
+# Version 1.2.1 (December 12, 2019)
 # Nathan Lenssen (lenssen@ldeo.columbia.edu)
 
 # load the data
@@ -38,7 +38,8 @@ trueMean <- globalMean(anomalyField = anomalyFieldAdj,
 					   lat = lat,
 					   nCores=nCores,
 					   zoneMask = zoneMask,
-					   simpleMean=TRUE)
+					   simpleMean=TRUE,
+					   ALn = ALn, ALs = ALs)
 
 rm(anomalyFieldAdj)
 gc()
@@ -64,7 +65,8 @@ for(i in 1:length(files)){
 						   lat = lat,
 						   nCores=nCores,
 						   zoneMask = zoneMask,
-						   simpleMean = TRUE)
+						   simpleMean = TRUE,
+						   ALn = ALn, ALs = ALs)
 
 	gc()
 
